@@ -1,0 +1,41 @@
+spring:
+  application:
+    name: bookshare-backend-test
+
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.H2Dialect
+
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: test-google-client-id
+            client-secret: test-google-client-secret
+
+jwt:
+  secret: test-256-bit-secret-key-here-which-should-be-at-least-32-characters-long
+  expiration: 86400000
+  refresh-expiration: 604800000
+
+app:
+  frontend-url: http://localhost:3000
+  cors:
+    allowed-origins: http://localhost:3000
+
+logging:
+  level:
+    root: WARN
+    com.bookshare: DEBUG
