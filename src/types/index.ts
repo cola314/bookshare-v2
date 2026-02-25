@@ -66,10 +66,21 @@ export interface PageResponse<T> {
   totalPages: number;
   totalElements: number;
   size: number;
-  number: number;
+  page: number;
+  number?: number;
   first: boolean;
   last: boolean;
-  empty: boolean;
+  empty?: boolean;
+}
+
+// 알라딘 검색 결과 타입
+export interface AladinSearchBook {
+  title: string;
+  meta?: string;
+  cover?: string;
+  link: string;
+  isbn13?: string;
+  source?: string;
 }
 
 // 공지사항 타입

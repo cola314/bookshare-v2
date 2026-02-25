@@ -129,11 +129,30 @@ export function createServerApi(accessToken?: string): AxiosInstance {
 }
 
 // ============= 책 관련 API =============
-import type { Book, Comment, PageResponse, Notice, Inquiry, Dashboard } from "@/types";
+import type {
+  AladinSearchBook,
+  Book,
+  Comment,
+  PageResponse,
+  Notice,
+  Inquiry,
+  Dashboard,
+} from "@/types";
 
 // 책 목록 조회
 export async function getBooks(page: number = 0): Promise<PageResponse<Book>> {
   return apiGet<PageResponse<Book>>(`/api/books?page=${page}&size=12`);
+}
+
+// 알라딘 검색
+export async function searchAladinBooks(
+  query: string,
+  page: number = 0,
+  size: number = 10
+): Promise<PageResponse<AladinSearchBook>> {
+  return apiGet<PageResponse<AladinSearchBook>>(
+    `/api/books/aladin-search?query=${encodeURIComponent(query)}&page=${page}&size=${size}`
+  );
 }
 
 // 책 상세 조회
