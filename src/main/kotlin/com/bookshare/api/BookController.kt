@@ -74,6 +74,24 @@ class BookController(
         return ResponseEntity.ok(PageResponse.from(result))
     }
 
+    @Operation(summary = "알라딘 자동완성", description = "알라딘 비공식 자동완성 엔드포인트 기반으로 검색어 추천 목록을 조회합니다.")
+    @ApiResponses(
+        ApiResponse(responseCode = "200", description = "조회 성공"),
+        ApiResponse(responseCode = "400", description = "query 파라미터 오류"),
+        ApiResponse(responseCode = "502", description = "알라딘 자동완성 조회 실패")
+    )
+    @GetMapping("/books/aladin-autocomplete")
+    fun autocompleteAladinBooks(
+        @Parameter(description = "검색어")
+        @RequestParam("query")
+        @NotBlank(message = "query는 필수입니다.")
+        query: String,
+        @RequestParam(name = "size", defaultValue = "10") size: Int
+    ): ResponseEntity<List<AladinSearchBookResponse>> {
+        val result = bookService.autocompleteAladinBooks(query, size)
+        return ResponseEntity.ok(result)
+    }
+
     @Operation(
         summary = "책 상세 조회",
         description = "책의 상세 정보를 조회합니다. (댓글 수, 좋아요 수 포함)",

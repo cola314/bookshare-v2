@@ -51,6 +51,19 @@ class BookService(
     }
 
     /**
+     * 알라딘 자동완성 추천어 조회 (비공식 엔드포인트)
+     */
+    fun autocompleteAladinBooks(query: String, size: Int): List<AladinSearchBookResponse> {
+        val normalizedQuery = query.trim()
+        if (normalizedQuery.isBlank()) {
+            throw BusinessException(ErrorCode.INVALID_INPUT, "query는 필수입니다.")
+        }
+
+        val normalizedSize = size.coerceIn(1, 20)
+        return aladinSearchClient.autocompleteBooks(normalizedQuery, normalizedSize)
+    }
+
+    /**
      * 책 상세 조회 (댓글 수, 좋아요 수 포함)
      */
     fun getBook(id: Long, currentUserId: Long?): BookResponse {

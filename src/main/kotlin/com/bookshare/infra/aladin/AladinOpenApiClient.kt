@@ -3,6 +3,9 @@ package com.bookshare.infra.aladin
 import com.bookshare.api.dto.AladinSearchBookResponse
 import com.bookshare.common.exception.BusinessException
 import com.bookshare.common.exception.ErrorCode
+import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import org.jsoup.Connection
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
@@ -17,9 +20,15 @@ class AladinSearchClient {
     companion object {
         private const val ALADIN_BASE_URL = "https://www.aladin.co.kr"
         private const val ALADIN_SEARCH_URL = "$ALADIN_BASE_URL/search/wsearchresult.aspx"
+        private const val ALADIN_AUTOCOMPLETE_URL = "$ALADIN_BASE_URL/search/v2/search-items.ashx"
         private const val USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
         private const val TIMEOUT_MS = 10000
+        private const val MIN_AUTOCOMPLETE_SIZE = 1
+        private const val MAX_AUTOCOMPLETE_SIZE = 20
+        private val TITLE_HIGHLIGHT_TAG_REGEX = Regex("</?em>", RegexOption.IGNORE_CASE)
     }
+
+    private val objectMapper = jacksonObjectMapper()
 
     fun searchBooks(query: String, pageable: Pageable): Page<AladinSearchBookResponse> {
         return try {
@@ -46,6 +55,80 @@ class AladinSearchClient {
                 e.message ?: ErrorCode.ALADIN_SEARCH_FAILED.message
             )
         }
+    }
+
+    fun autocompleteBooks(query: String, size: Int): List<AladinSearchBookResponse> {
+        val normalizedSize = size.coerceIn(MIN_AUTOCOMPLETE_SIZE, MAX_AUTOCOMPLETE_SIZE)
+
+        return try {
+            val responseBody = Jsoup.connect(ALADIN_AUTOCOMPLETE_URL)
+                .userAgent(USER_AGENT)
+                .timeout(TIMEOUT_MS)
+                .ignoreContentType(true)
+                .method(Connection.Method.POST)
+                .data("q", query)
+                .data("t", "Book")
+                .data("mode", "0")
+                .execute()
+                .body()
+
+            parseAutocompleteResponse(responseBody, normalizedSize)
+        } catch (e: BusinessException) {
+            throw e
+        } catch (e: Exception) {
+            throw BusinessException(
+                ErrorCode.ALADIN_SEARCH_FAILED,
+                e.message ?: ErrorCode.ALADIN_SEARCH_FAILED.message
+            )
+        }
+    }
+
+    private fun parseAutocompleteResponse(responseBody: String, size: Int): List<AladinSearchBookResponse> {
+        val root = objectMapper.readTree(responseBody)
+        validateAutocompleteResult(root)
+
+        val listNode = root.path("List")
+        if (!listNode.isArray) return emptyList()
+
+        return listNode
+            .asSequence()
+            .mapNotNull { node -> mapAutocompleteItem(node) }
+            .take(size)
+            .toList()
+    }
+
+    private fun validateAutocompleteResult(root: JsonNode) {
+        val resultCode = root.path("ResultCode").asInt(-1)
+        if (resultCode != 1) {
+            throw BusinessException(
+                ErrorCode.ALADIN_SEARCH_FAILED,
+                "알라딘 자동완성 조회 실패 (ResultCode=$resultCode)"
+            )
+        }
+    }
+
+    private fun mapAutocompleteItem(node: JsonNode): AladinSearchBookResponse? {
+        val itemId = node.path("ItemId").asLong(0L)
+        if (itemId <= 0L) return null
+
+        val rawTitle = node.path("Title").asText("")
+        val title = sanitizeAutocompleteTitle(rawTitle)
+        if (title.isBlank()) return null
+
+        return AladinSearchBookResponse(
+            title = title,
+            meta = "",
+            cover = null,
+            link = "$ALADIN_BASE_URL/shop/wproduct.aspx?ItemId=$itemId",
+            isbn13 = ""
+        )
+    }
+
+    private fun sanitizeAutocompleteTitle(rawTitle: String): String {
+        return TITLE_HIGHLIGHT_TAG_REGEX
+            .replace(rawTitle, "")
+            .replace(Regex("\\s+"), " ")
+            .trim()
     }
 
     private fun parseBooks(document: Document): List<AladinSearchBookResponse> {
