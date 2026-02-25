@@ -1,11 +1,13 @@
 package com.bookshare.domain.book
 
+import com.bookshare.api.dto.AladinSearchBookResponse
 import com.bookshare.api.dto.BookListResponse
 import com.bookshare.api.dto.BookResponse
 import com.bookshare.common.exception.BusinessException
 import com.bookshare.common.exception.ErrorCode
 import com.bookshare.domain.user.User
 import com.bookshare.domain.user.UserRepository
+import com.bookshare.infra.aladin.AladinSearchClient
 import com.bookshare.infra.crawler.BookCrawler
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -18,7 +20,8 @@ class BookService(
     private val bookRepository: BookRepository,
     private val commentRepository: CommentRepository,
     private val userRepository: UserRepository,
-    private val bookCrawler: BookCrawler
+    private val bookCrawler: BookCrawler,
+    private val aladinSearchClient: AladinSearchClient
 ) {
 
     /**
@@ -35,6 +38,16 @@ class BookService(
     fun getBooksByUser(userId: Long, pageable: Pageable): Page<BookListResponse> {
         return bookRepository.findByUploadedByIdAndIsDeletedFalseOrderByUploadDateDesc(userId, pageable)
             .map { BookListResponse.from(it, commentRepository.countByBookIdAndIsDeletedFalse(it.id)) }
+    }
+
+    /**
+     * 알라딘 웹사이트 키워드 검색
+     */
+    fun searchAladinBooks(query: String, pageable: Pageable): Page<AladinSearchBookResponse> {
+        if (query.isBlank()) {
+            throw BusinessException(ErrorCode.INVALID_INPUT, "query는 필수입니다.")
+        }
+        return aladinSearchClient.searchBooks(query.trim(), pageable)
     }
 
     /**
@@ -56,6 +69,10 @@ class BookService(
     fun createBook(userId: Long, aladinUrl: String, comment: String?): BookResponse {
         val user = findUserById(userId)
         val bookInfo = bookCrawler.crawlBookInfo(aladinUrl, user)
+
+        if (bookRepository.existsByLinkAndIsDeletedFalse(bookInfo.link)) {
+            throw BusinessException(ErrorCode.DUPLICATE_BOOK_LINK)
+        }
 
         val book = Book(
             title = bookInfo.title,

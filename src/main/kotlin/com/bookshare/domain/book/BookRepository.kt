@@ -17,6 +17,8 @@ interface BookRepository : JpaRepository<Book, Long> {
 
     fun findByIdAndIsDeletedFalse(id: Long): Book?
 
+    fun existsByLinkAndIsDeletedFalse(link: String): Boolean
+
     @Query("SELECT COUNT(b) FROM Book b WHERE b.isDeleted = false")
     fun countActiveBooks(): Long
 }

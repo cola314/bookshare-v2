@@ -23,6 +23,8 @@ enum class ErrorCode(
     NOT_BOOK_OWNER(HttpStatus.FORBIDDEN, "B002", "책의 소유자만 수정/삭제할 수 있습니다."),
     INVALID_ALADIN_URL(HttpStatus.BAD_REQUEST, "B003", "유효하지 않은 알라딘 URL입니다."),
     CRAWLING_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "B004", "책 정보를 가져오는데 실패했습니다."),
+    ALADIN_SEARCH_FAILED(HttpStatus.BAD_GATEWAY, "B005", "알라딘 검색에 실패했습니다."),
+    DUPLICATE_BOOK_LINK(HttpStatus.CONFLICT, "B006", "이미 등록된 책 링크입니다."),
 
     // Comment
     COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "CM001", "댓글을 찾을 수 없습니다."),

@@ -10,17 +10,20 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
+import jakarta.validation.constraints.NotBlank
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
 import org.springframework.data.web.PageableDefault
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.validation.annotation.Validated
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 
 @Tag(name = "Books", description = "Book API")
 @RestController
 @RequestMapping("/api")
+@Validated
 class BookController(
     private val bookService: BookService
 ) {
@@ -49,6 +52,25 @@ class BookController(
         pageable: Pageable
     ): ResponseEntity<PageResponse<BookListResponse>> {
         val result = bookService.getBooksByUser(userId, pageable)
+        return ResponseEntity.ok(PageResponse.from(result))
+    }
+
+    @Operation(summary = "알라딘 키워드 검색", description = "알라딘 웹사이트 검색 결과를 크롤링해 책을 검색합니다.")
+    @ApiResponses(
+        ApiResponse(responseCode = "200", description = "조회 성공"),
+        ApiResponse(responseCode = "400", description = "query 파라미터 오류"),
+        ApiResponse(responseCode = "502", description = "알라딘 웹사이트 검색 실패")
+    )
+    @GetMapping("/books/aladin-search")
+    fun searchAladinBooks(
+        @Parameter(description = "검색어")
+        @RequestParam("query")
+        @NotBlank(message = "query는 필수입니다.")
+        query: String,
+        @PageableDefault(size = 20)
+        pageable: Pageable
+    ): ResponseEntity<PageResponse<AladinSearchBookResponse>> {
+        val result = bookService.searchAladinBooks(query, pageable)
         return ResponseEntity.ok(PageResponse.from(result))
     }
 

@@ -90,3 +90,12 @@ data class UserSummary(
     val username: String,
     val profileImageUrl: String?
 )
+
+data class AladinSearchBookResponse(
+    val title: String,
+    val meta: String,
+    val cover: String?,
+    val link: String,
+    val isbn13: String,
+    val source: String = "ALADIN"
+)
