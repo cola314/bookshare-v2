@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import { useAuthStore } from "@/store/useAuthStore";
-import { createBook, searchAladinBooks } from "@/lib/api";
+import { autocompleteAladinBooks, createBook, searchAladinBooks } from "@/lib/api";
 import type { AladinSearchBook, PageResponse } from "@/types";
 
 type UploadStep = "search" | "comment";
@@ -54,9 +54,9 @@ export default function BookUploadPage() {
     const timeoutId = window.setTimeout(async () => {
       setIsSuggesting(true);
       try {
-        const result = await searchAladinBooks(query, 0, 5);
+        const result = await autocompleteAladinBooks(query, 5);
         if (!cancelled) {
-          setSuggestions(result.content);
+          setSuggestions(result);
         }
       } catch {
         if (!cancelled) {

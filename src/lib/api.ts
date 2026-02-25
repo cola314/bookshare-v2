@@ -155,6 +155,16 @@ export async function searchAladinBooks(
   );
 }
 
+// 알라딘 자동완성
+export async function autocompleteAladinBooks(
+  query: string,
+  size: number = 10
+): Promise<AladinSearchBook[]> {
+  return apiGet<AladinSearchBook[]>(
+    `/api/books/aladin-autocomplete?query=${encodeURIComponent(query)}&size=${size}`
+  );
+}
+
 // 책 상세 조회
 export async function getBook(id: number): Promise<Book> {
   return apiGet<Book>(`/api/books/${id}`);
