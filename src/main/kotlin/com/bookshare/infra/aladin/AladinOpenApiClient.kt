@@ -80,10 +80,24 @@ class AladinSearchClient {
     }
 
     private fun extractCover(container: Element): String? {
-        val image = container.selectFirst("img") ?: return null
-        val src = image.attr("data-src").ifBlank { image.attr("src") }
-        if (src.isBlank()) return null
-        return normalizeImageUrl(src)
+        val imageCandidates = listOf(
+            "div.cover_area img.front_cover",
+            "div.cover_area img",
+            "img.front_cover",
+            "a img.front_cover",
+            "a img",
+            "img"
+        )
+
+        for (selector in imageCandidates) {
+            val image = container.selectFirst(selector) ?: continue
+            val src = image.attr("data-src").ifBlank { image.attr("src") }
+            if (src.isNotBlank()) {
+                return normalizeImageUrl(src)
+            }
+        }
+
+        return null
     }
 
     private fun extractMeta(container: Element, title: String): String {
@@ -147,12 +161,17 @@ class AladinSearchClient {
     }
 
     private fun normalizeImageUrl(url: String): String {
-        return when {
+        val normalized = when {
             url.startsWith("https://") -> url
             url.startsWith("http://") -> "https://${url.removePrefix("http://")}"
             url.startsWith("//") -> "https:$url"
             url.startsWith("/") -> "$ALADIN_BASE_URL$url"
             else -> url
         }
+
+        return normalized
+            .replace("/cover150/", "/cover200/")
+            .replace("_cover150", "_cover200")
+            .replace("cover/150/", "cover/200/")
     }
 }
