@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/useAuthStore";
+import { UserAvatar } from "@/components/ui";
 import api from "@/lib/api";
 
 export default function MyPage() {
@@ -90,15 +91,14 @@ export default function MyPage() {
         <h1 className="title">내 정보</h1>
 
         <div className="box">
-          {user.profileImageUrl && (
-            <figure className="image is-96x96 mb-4">
-              <img
-                src={user.profileImageUrl}
-                alt={user.username}
-                style={{ borderRadius: "50%", objectFit: "cover" }}
-              />
-            </figure>
-          )}
+          <figure className="image is-96x96 mb-4">
+            <UserAvatar
+              username={user.username}
+              profileImageUrl={user.profileImageUrl}
+              size={96}
+              alt={user.username}
+            />
+          </figure>
 
           <form onSubmit={handleSubmit} className="mb-4">
             <div className="field">

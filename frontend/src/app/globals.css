@@ -8,12 +8,15 @@ pre {
 }
 
 minidenticon-svg {
-  height: 40px;
-  width: 40px;
-}
-minidenticon-svg svg {
+  display: block;
   border-radius: 50%;
+  overflow: hidden;
   border: 1px solid hsl(0, 0%, 71%);
-  height: 40px;
-  width: 40px;
+}
+
+minidenticon-svg svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
 }

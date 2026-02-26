@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useAuthStore } from "@/store/useAuthStore";
-
+import { UserAvatar } from "@/components/ui";
 export function Header() {
   const { user, isAuthenticated, isHydrated, logout } = useAuthStore();
   const [isActive, setIsActive] = useState(false);
@@ -51,8 +51,14 @@ export function Header() {
           {isHydrated && isAuthenticated && user ? (
             <>
               <div className="navbar-item">
-                <Link className="is-underlined has-text-dark" href="/mypage">
-                  {user.username}
+                <Link className="is-underlined has-text-dark is-flex is-align-items-center" href="/mypage">
+                  <UserAvatar
+                    username={user.username}
+                    profileImageUrl={user.profileImageUrl}
+                    size={24}
+                    alt={user.username}
+                  />
+                  <span className="ml-2">{user.username}</span>
                 </Link>
               </div>
               <div className="navbar-item">

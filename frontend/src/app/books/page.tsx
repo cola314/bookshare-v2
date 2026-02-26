@@ -4,8 +4,8 @@ import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useBookStore } from "@/store/useBookStore";
+import { UserAvatar } from "@/components/ui";
 import { getBooks, getBooksByUser } from "@/lib/api";
-
 function BooksContent() {
   const searchParams = useSearchParams();
   const userId = searchParams.get("userId");
@@ -77,8 +77,16 @@ function BooksContent() {
                         </div>
                       )}
                       <div className="is-flex is-align-items-center mb-3">
-                        <span>작성자: </span>
-                        <span className="ml-1">{book.uploadedBy?.username}</span>
+                        <span>작성자:</span>
+                        <span className="ml-2">
+                          <UserAvatar
+                            username={book.uploadedBy?.username}
+                            profileImageUrl={book.uploadedBy?.profileImageUrl}
+                            size={24}
+                            alt={book.uploadedBy?.username}
+                          />
+                        </span>
+                        <span className="ml-2">{book.uploadedBy?.username}</span>
                       </div>
                       {book.comment && <pre>{book.comment}</pre>}
                       <p>{new Date(book.uploadDate).toLocaleDateString("ko-KR", { year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" })}</p>

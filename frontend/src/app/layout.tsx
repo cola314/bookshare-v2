@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import Script from "next/script";
 import "./globals.css";
 import { Providers } from "@/components/providers";
 import { Header } from "@/components/layout/Header";
@@ -58,6 +59,14 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="apple-mobile-web-app-title" content="BookShare" />
+        <Script
+          type="module"
+          src="https://cdn.jsdelivr.net/npm/minidenticons@4.2.0/minidenticons.min.js"
+          strategy="beforeInteractive"
+          integrity="sha384-A8FsxkwjpsLEaYTk9x/3iKkID7jHsAtEWY3bt0ufPUtfsgI1xFvOqothGa6S5QKL"
+          crossOrigin="anonymous"
+          referrerPolicy="no-referrer"
+        />
       </head>
       <body>
         <Providers>

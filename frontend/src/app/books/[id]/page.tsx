@@ -5,8 +5,8 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { useBookStore } from "@/store/useBookStore";
 import { useAuthStore } from "@/store/useAuthStore";
+import { UserAvatar } from "@/components/ui";
 import { getBook, getComments, toggleLike, deleteBook, createComment, deleteComment } from "@/lib/api";
-import type { Comment } from "@/types";
 
 export default function BookDetailPage() {
   const params = useParams();
@@ -136,8 +136,16 @@ export default function BookDetailPage() {
                   </div>
                 )}
                 <div className="is-flex is-align-items-center mb-3">
-                  <span>작성자: </span>
-                  <span className="ml-1">{currentBook.uploadedBy?.username}</span>
+                  <span>작성자:</span>
+                  <span className="ml-2">
+                    <UserAvatar
+                      username={currentBook.uploadedBy?.username}
+                      profileImageUrl={currentBook.uploadedBy?.profileImageUrl}
+                      size={24}
+                      alt={currentBook.uploadedBy?.username}
+                    />
+                  </span>
+                  <span className="ml-2">{currentBook.uploadedBy?.username}</span>
                 </div>
                 {currentBook.comment && <pre>{currentBook.comment}</pre>}
                 <p>{formatDate(currentBook.uploadDate)}</p>
@@ -171,8 +179,16 @@ export default function BookDetailPage() {
         {comments.map((comment) => (
           <div key={comment.id} className="box">
             <div className="is-flex is-align-items-center mb-3">
-              <span>작성자: </span>
-              <span className="ml-1">
+              <span>작성자:</span>
+              <span className="ml-2">
+                <UserAvatar
+                  username={comment.createdBy?.username}
+                  profileImageUrl={comment.createdBy?.profileImageUrl}
+                  size={24}
+                  alt={comment.createdBy?.username || "알 수 없음"}
+                />
+              </span>
+              <span className="ml-2">
                 {comment.createdBy?.username || "알 수 없음"}
               </span>
             </div>
