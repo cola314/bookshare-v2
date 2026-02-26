@@ -85,8 +85,6 @@ jobs:
           push: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
           tags: ${{ steps.arch_tags.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha,scope=${{ matrix.service.image_suffix }}-${{ matrix.arch.arch_suffix }}
-          cache-to: type=gha,mode=max,scope=${{ matrix.service.image_suffix }}-${{ matrix.arch.arch_suffix }}
 
   merge:
     name: Merge manifests (${{ matrix.service.name }})
