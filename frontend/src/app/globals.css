@@ -1,0 +1,19 @@
+.break-word {
+  word-wrap: break-word;
+}
+
+pre {
+  white-space: pre-wrap !important;
+  word-break: break-word !important;
+}
+
+minidenticon-svg {
+  height: 40px;
+  width: 40px;
+}
+minidenticon-svg svg {
+  border-radius: 50%;
+  border: 1px solid hsl(0, 0%, 71%);
+  height: 40px;
+  width: 40px;
+}
