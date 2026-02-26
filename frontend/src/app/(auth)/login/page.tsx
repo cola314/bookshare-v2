@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useAuthStore } from "@/store/useAuthStore";
 import api from "@/lib/api";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "";
 
 function LoginForm() {
   const router = useRouter();
