@@ -1,6 +1,7 @@
 package com.bookshare.config.oauth
 
 import com.bookshare.config.jwt.JwtTokenProvider
+import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.slf4j.LoggerFactory
@@ -13,6 +14,7 @@ import org.springframework.web.util.UriComponentsBuilder
 @Component
 class OAuth2SuccessHandler(
     private val jwtTokenProvider: JwtTokenProvider,
+    private val objectMapper: ObjectMapper,
     @Value("\${app.frontend-url}")
     private val frontendUrl: String
 ) : SimpleUrlAuthenticationSuccessHandler() {
@@ -32,9 +34,20 @@ class OAuth2SuccessHandler(
         val accessToken = jwtTokenProvider.generateToken(user)
         val refreshToken = jwtTokenProvider.generateRefreshToken(user)
 
+        val userJson = objectMapper.writeValueAsString(
+            mapOf(
+                "id" to user.id,
+                "email" to user.email,
+                "username" to user.username,
+                "role" to user.role.name,
+                "profileImageUrl" to user.profileImageUrl
+            )
+        )
+
         val targetUrl = UriComponentsBuilder.fromUriString("$frontendUrl/oauth/callback")
             .queryParam("accessToken", accessToken)
             .queryParam("refreshToken", refreshToken)
+            .queryParam("user", userJson)
             .build()
             .toUriString()
 

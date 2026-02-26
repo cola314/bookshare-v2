@@ -30,28 +30,36 @@ function OAuthCallbackContent() {
         let user = null;
         if (userParam) {
           try {
-            user = JSON.parse(decodeURIComponent(userParam));
+            user = JSON.parse(userParam);
           } catch {
-            // user 파싱 실패 시 기본값 사용
-            user = {
-              id: "",
-              email: "",
-              name: "사용자",
-              role: "USER",
-            };
+            try {
+              user = JSON.parse(decodeURIComponent(userParam));
+            } catch {
+              // user 파싱 실패 시 기본값 사용
+              user = {
+                id: "",
+                email: "",
+                username: "사용자",
+                role: "USER",
+              };
+            }
           }
         } else {
           // user 정보가 없으면 기본값 사용
           user = {
             id: "",
             email: "",
-            name: "사용자",
+            username: "사용자",
             role: "USER",
           };
         }
 
         // 토큰과 사용자 정보 저장
-        login(accessToken, user, refreshToken || undefined);
+        const normalizedUser = {
+          ...user,
+          username: user.username || "사용자",
+        };
+        login(accessToken, normalizedUser, refreshToken || undefined);
 
         // 홈페이지로 리다이렉트
         router.push("/");

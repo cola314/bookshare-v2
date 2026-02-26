@@ -56,7 +56,7 @@ class AuthController(
         // Create new user
         val user = User(
             email = request.email,
-            username = request.name,
+            username = request.username,
             password = passwordEncoder.encode(request.password),
             nickname = request.nickname,
             provider = OAuthProvider.LOCAL,
@@ -182,9 +182,9 @@ data class RegisterRequest(
     @field:Size(min = 8, max = 100, message = "Password must be between 8 and 100 characters")
     val password: String,
 
-    @field:NotBlank(message = "Name is required")
-    @field:Size(min = 2, max = 50, message = "Name must be between 2 and 50 characters")
-    val name: String,
+    @field:NotBlank(message = "Username is required")
+    @field:Size(min = 2, max = 50, message = "Username must be between 2 and 50 characters")
+    val username: String,
 
     @field:Size(max = 50, message = "Nickname must be at most 50 characters")
     val nickname: String? = null

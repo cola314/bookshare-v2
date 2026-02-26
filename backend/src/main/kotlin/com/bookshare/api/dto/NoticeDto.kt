@@ -39,6 +39,7 @@ data class NoticeResponse(
 data class NoticeListResponse(
     val id: Long,
     val title: String,
+    val content: String,
     val createdAt: LocalDateTime,
     val topFixed: Boolean
 ) {
@@ -47,6 +48,7 @@ data class NoticeListResponse(
             return NoticeListResponse(
                 id = notice.id,
                 title = notice.title,
+                content = notice.content,
                 createdAt = notice.createdAt,
                 topFixed = notice.topFixed
             )

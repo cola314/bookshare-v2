@@ -11,7 +11,7 @@ export default function RegisterPage() {
     email: "",
     password: "",
     confirmPassword: "",
-    name: "",
+    username: "",
     nickname: "",
   });
   const [error, setError] = useState("");
@@ -42,7 +42,7 @@ export default function RegisterPage() {
       await api.post("/api/auth/register", {
         email: formData.email,
         password: formData.password,
-        name: formData.name,
+        username: formData.username,
         nickname: formData.nickname,
       });
 
@@ -86,14 +86,14 @@ export default function RegisterPage() {
               </div>
 
               <div className="field">
-                <label className="label">이름</label>
+                <label className="label">사용자명</label>
                 <div className="control">
                   <input
                     className="input"
-                    id="name"
-                    name="name"
+                    id="username"
+                    name="username"
                     type="text"
-                    value={formData.name}
+                    value={formData.username}
                     onChange={handleChange}
                     required
                     placeholder="홍길동"

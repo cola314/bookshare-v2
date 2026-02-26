@@ -2,10 +2,10 @@ import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 
 interface User {
-  id: string;
+  id: string | number;
   email: string;
-  name: string;
-  image?: string;
+  username: string;
+  profileImageUrl?: string | null;
   role: string;
 }
 

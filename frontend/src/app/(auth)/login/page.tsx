@@ -37,7 +37,11 @@ function LoginForm() {
       const response = await api.post("/api/auth/login", { email, password });
       const data = response.data;
       if (data.accessToken && data.user) {
-        login(data.accessToken, data.user, data.refreshToken);
+        const normalizedUser = {
+          ...data.user,
+          username: data.user.username || "사용자",
+        };
+        login(data.accessToken, normalizedUser, data.refreshToken);
         router.push(callbackUrl);
       } else {
         setError("로그인 응답이 올바르지 않습니다.");

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useAuthStore } from "@/store/useAuthStore";
 
 export function Header() {
@@ -52,7 +52,7 @@ export function Header() {
             <>
               <div className="navbar-item">
                 <Link className="is-underlined has-text-dark" href="/mypage">
-                  {user.name}
+                  {user.username}
                 </Link>
               </div>
               <div className="navbar-item">
