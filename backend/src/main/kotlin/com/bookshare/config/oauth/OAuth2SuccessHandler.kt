@@ -49,6 +49,7 @@ class OAuth2SuccessHandler(
             .queryParam("refreshToken", refreshToken)
             .queryParam("user", userJson)
             .build()
+            .encode()
             .toUriString()
 
         log.debug("Redirecting to: $targetUrl")
