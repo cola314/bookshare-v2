@@ -21,6 +21,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.web.bind.annotation.*
+import java.time.LocalDateTime
 import java.util.UUID
 
 @Tag(name = "Auth", description = "Authentication API")
@@ -95,6 +96,46 @@ class AuthController(
             return ResponseEntity.status(401).build()
         }
         return ResponseEntity.ok(UserResponse.from(user))
+    }
+
+    @Operation(
+        summary = "Update current user profile",
+        description = "Updates the currently authenticated user's username",
+        security = [SecurityRequirement(name = "bearerAuth")]
+    )
+    @ApiResponses(
+        ApiResponse(responseCode = "200", description = "Successfully updated profile"),
+        ApiResponse(responseCode = "400", description = "Invalid input"),
+        ApiResponse(responseCode = "401", description = "Unauthorized"),
+        ApiResponse(responseCode = "409", description = "Username already exists")
+    )
+    @PatchMapping("/me")
+    fun updateCurrentUser(
+        @AuthenticationPrincipal user: User?,
+        @Valid @RequestBody request: UpdateUserRequest
+    ): ResponseEntity<Any> {
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(ErrorResponse("Unauthorized"))
+        }
+
+        val username = request.username.trim()
+
+        if (username.length < 2 || username.length > 50) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ErrorResponse("Username must be between 2 and 50 characters"))
+        }
+
+        if (user.username != username && userRepository.existsByUsername(username)) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(ErrorResponse("Username already exists"))
+        }
+
+        user.username = username
+        user.updatedAt = LocalDateTime.now()
+        val savedUser = userRepository.save(user)
+
+        return ResponseEntity.ok(UserResponse.from(savedUser))
     }
 
     @Operation(
@@ -208,6 +249,12 @@ data class LoginRequest(
 
     @field:NotBlank(message = "Password is required")
     val password: String
+)
+
+data class UpdateUserRequest(
+    @field:NotBlank(message = "Username is required")
+    @field:Size(min = 2, max = 50, message = "Username must be between 2 and 50 characters")
+    val username: String
 )
 
 data class LoginResponse(
