@@ -47,7 +47,11 @@ export default function NoticePage() {
           <>
             <div className="mb-2">
               {notices.map((notice) => (
-                <Link key={notice.id} href={`/notice/${notice.id}`} style={{ display: "block" }}>
+                <Link
+                  key={notice.id}
+                  href={`/notice/${notice.id}`}
+                  style={{ display: "block", marginBottom: "1rem" }}
+                >
                   <div className="box content">
                     <h3>{notice.topFixed ? `(중요) ${notice.title}` : notice.title}</h3>
                     {notice.content && <pre>{notice.content}</pre>}
