@@ -45,9 +45,8 @@ class CustomOAuth2UserService(
         val existingUser = userRepository.findByProviderAndProviderId(provider, userInfo.id)
 
         return if (existingUser != null) {
-            // Update existing user info
+            // Update existing user info (keep username customized by user)
             existingUser.apply {
-                username = userInfo.name
                 email = userInfo.email
                 profileImageUrl = userInfo.imageUrl
                 updatedAt = java.time.LocalDateTime.now()
